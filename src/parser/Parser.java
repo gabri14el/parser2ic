@@ -17,8 +17,8 @@ import javax.xml.stream.XMLStreamReader;
 
 
 /**
- * 
- * @author Gabriel Antonio Pereira dos Santos Carneiro
+ * Classe que lê e converte em nodes e tweets (objetos) os arquivos xml e txt, respectivamente. 
+ * @author gabri14el
  *
  */
 public class Parser {
@@ -51,27 +51,6 @@ public class Parser {
 	}
 
 
-//	public static void main(String[] args) {
-//		Parser a = new Parser();
-//		a.init(null, "marketplace");
-//		a.leClientes(null);
-//		Collection<Node> b = a.getNodes();
-////		for (Node node : b) {
-////			System.out.println(node);
-////		}
-//		
-//		for (Node node : a.facilities) {
-//			System.out.println(node);
-//		}
-//		
-//		for (Tweet tweet : a.clientes) {
-//			System.out.println(tweet);
-//		}
-//		System.out.println(a.facilities.size());
-//		System.out.println(a.pontos.size());
-//		System.out.println(a.clientes.size());
-//	}
-	
 	public List<Node> getNodes() {
 		return pontos;
 	}
@@ -85,17 +64,16 @@ public class Parser {
 	public void leClientes(String txt){
 		try {
 			BufferedReader reader = new BufferedReader(new FileReader(txt));
-			//BufferedReader reader = new BufferedReader(new FileReader("/Users/gabrielantonio/Downloads/Archive/Salvador.txt"));
-			reader.readLine();
+			reader.readLine(); //Lê linha de início #id lat .. 
 			while(reader.ready()){
 				String linha = reader.readLine();
-				StringTokenizer token = new StringTokenizer(linha);
+				StringTokenizer token = new StringTokenizer(linha); //tokens utilizando " "
 				Tweet tmp = new Tweet();
 				tmp.id = Integer.parseInt(token.nextToken()); //id
 				tmp.lat = Double.parseDouble(token.nextToken());
 				tmp.lon = Double.parseDouble(token.nextToken());
 				tmp.data = new Date(Long.parseLong(token.nextToken()));
-				tmp.texto = token.nextToken("");
+				tmp.texto = token.nextToken(""); //so resta o texto do tweet então pega todos os tokens 
 				clientes.add(tmp);
 			}
 			reader.close();
@@ -123,16 +101,15 @@ public class Parser {
 				
 				switch (event) {
 				case XMLStreamConstants.START_ELEMENT:
-					if("node".equals(reader.getLocalName())){
+					if("node".equals(reader.getLocalName())){ //pega o inicio do elemento node, ou seja: <Node ....>
 						
 						nodeAtual = new Node();
-						//if(!nodes.contains(nodeAtual)) 
 							pontos.add(nodeAtual);
-						//nodeAtual.id = Integer.parseInt(reader.getAttributeValue(0));
-						nodeAtual.lat = Double.parseDouble(reader.getAttributeValue(1));
-						nodeAtual.lon = Double.parseDouble(reader.getAttributeValue(2));
+						//nodeAtual.id = Integer.parseInt(reader.getAttributeValue(0)); //erro nesse parse não to afim de corrigir pois não é necessário por enquanto
+						nodeAtual.lat = Double.parseDouble(reader.getAttributeValue(1)); //pega o valor do atributo 2, que é sempre a latitude ou "lat" 
+						nodeAtual.lon = Double.parseDouble(reader.getAttributeValue(2)); // '' longitude ou "lon"
 					}
-					else if("way".equals(reader.getLocalName())){
+					else if("way".equals(reader.getLocalName())){ //consome todas as tags way, para evitar bugs na leitura. Ainda não sei o que são ways
 						boolean tmp = true; 
 						int tmp_event;
 						while(tmp){
@@ -143,16 +120,15 @@ public class Parser {
 								}
 							}
 							
-						} //fim while
+						} 
 						
 					}
-					else if("tag".equals(reader.getLocalName())){
+					else if("tag".equals(reader.getLocalName())){ //captura inicio de elemtnos <tag .. /> para obter o atributo amenity
 						if(reader.getAttributeValue(0).equals("amenity")){
 							nodeAtual.amenity = reader.getAttributeValue(1);
 							
 							if(type != null) 
-								if(nodeAtual.amenity.equals(type)) 
-									//if(!facilities.contains(nodeAtual)) 
+								if(nodeAtual.amenity.equals(type)) //caso a amenity seja igual a que queremos, salva numa lista separada que representa as facilities
 									facilities.add(nodeAtual);
                                                                 
 						}
@@ -170,9 +146,9 @@ public class Parser {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+
                 
-                
-                pontos.removeAll(facilities);
+                pontos.removeAll(facilities); //remove todas as facilities que queremos da lista de pontos
 		
 	}
 }

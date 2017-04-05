@@ -2,6 +2,13 @@ package parser;
 
 import java.awt.geom.Point2D;
 
+
+/**
+ * Classe representa um <Node> do osm xml. 
+ * Classe herda de Point2D para poder ser usada nos algoritmos de 
+ * busca por localização otima
+ * @author gabri14el
+ */
 public class Node extends Point2D{
 
 	int id; 
